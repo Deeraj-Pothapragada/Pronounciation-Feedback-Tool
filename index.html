@@ -33,7 +33,7 @@
                     formData.append("audio", audioBlob, "input.wav");
 
                     document.getElementById("status").innerText = "Uploading...";
-                    let response = await fetch("https://YOUR_BACKEND_URL/align", {
+                    let response = await fetch("https://pronounciation-feedback-tool.onrender.com", {
                         method: "POST",
                         body: formData
                     });
@@ -52,3 +52,4 @@
     </script>
 </body>
 </html>
+
