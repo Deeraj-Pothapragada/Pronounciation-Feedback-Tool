@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Japanese Pronunciation Practice</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        button { padding: 10px 20px; font-size: 16px; }
+        #status { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Japanese Pronunciation Practice</h1>
+    <div id="vocab-display" style="margin-top:20px;">
+    <p><strong>Word:</strong> <span id="word"></span></p>
+    <p><strong>Hiragana:</strong> <span id="hiragana"></span></p>
+    <p><strong>Meaning:</strong> <span id="meaning"></span></p>
+    <p><strong>Chapter:</strong> <span id="chapter"></span></p>
+    </div>
+
+    <button id="recordBtn">🎤 Record</button>
+    <button id="stopBtn" disabled>⏹️ Stop</button>
+    <div id="feedback"></div>
+
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        let currentWord = null;  // stores the word currently shown
+
+        async function loadWord() {
+        const res = await fetch("/random_word");
+        const data = await res.json();
+        currentWord = data;
+
+        document.getElementById("word").textContent = data.kanji_or_hiragana;
+        document.getElementById("hiragana").textContent = data.hiragana;
+        document.getElementById("meaning").textContent = data.meaning;
+        document.getElementById("chapter").textContent = data.chapter;
+
+        }
+
+        window.onload = loadWord;
+
+
+        const recordBtn = document.getElementById("recordBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const feedbackDiv = document.getElementById("feedback");
+
+
+            // Start recording
+        recordBtn.onclick = async () => {
+        audioChunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = sendAudio;
+        mediaRecorder.start();
+
+        recordBtn.disabled = true;
+        stopBtn.disabled = false;
+        feedbackDiv.innerText = "Recording... 🎤";
+        };
+
+        // Stop recording
+        stopBtn.onclick = () => {
+        mediaRecorder.stop();
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+        feedbackDiv.innerText = "Processing... ⏳";
+        };
+
+        // Send audio to backend
+        async function sendAudio() {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const formData = new FormData();
+        formData.append("audio", audioBlob, "input.wav");
+        formData.append("target_word", currentWord.kanji_or_hiragana);
+
+
+        try {
+            const response = await fetch("/align", {
+            method: "POST",
+            body: formData
+            });
+            const result = await response.json();
+            feedbackDiv.innerText = result.feedback;
+            setTimeout(loadWord, 2000)
+        } catch (error) {
+            console.error("Error:", error);
+            feedbackDiv.innerText = "❌ Error sending audio";
+        }
+
+
+        }
+    </script>
+</body>
+</html>
