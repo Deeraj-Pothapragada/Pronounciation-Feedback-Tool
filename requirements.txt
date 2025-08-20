@@ -3,6 +3,7 @@ gunicorn
 gtts
 montreal-forced-aligner==2.2.17
 numpy==1.26.4
-scipy==1.13.1
+scipy==1.11.4
 scikit-learn==1.3.2
+
 
