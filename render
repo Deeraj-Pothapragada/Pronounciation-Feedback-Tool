@@ -4,6 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: |
-      apt-get update && apt-get install -y ffmpeg
+      apt-get update && apt-get install -y ffmpeg build-essential gfortran libatlas-base-dev
       pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:10000
+
