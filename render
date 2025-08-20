@@ -1,8 +1,13 @@
 services:
   - type: web
-    name: my_app
-    env: docker
+    name: mfa-app
+    env: python
     plan: free
-    dockerfilePath: ./Dockerfile
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app
+
+
 
 
