@@ -1,0 +1,27 @@
+# Use a base image with Python (avoid 3.13 since many ML libs lag behind)
+FROM python:3.10-slim
+
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    gfortran \
+    libopenblas-dev \
+    liblapack-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip setuptools wheel
+
+RUN pip install \
+    flask \
+    gunicorn \
+    gtts \
+    numpy==1.26.4 \
+    scipy==1.11.4 \
+    scikit-learn==1.5.1 \
+    montreal-forced-aligner==2.2.17
+
+WORKDIR /app
+COPY . /app
+
+EXPOSE 10000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
