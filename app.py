@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 LEXICON = "japanese_mfa.dict"
 MFA_MODEL = "japanese_mfa_acoustic"
-UPLOAD_FOLDER = "/tmp"
+UPLOAD_FOLDER = "/tmp/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
@@ -85,22 +85,15 @@ def make_lab(word, save_path):
 
 
 def run_mfa(corpus_dir, dict_path, model_path, output_dir):
-
-    cmd = [
-    "mfa", "align",
-    corpus_dir,
-    dict_path,
-    model_path,
-    output_dir
+    mfa_cmd = [
+        "mfa", "align", corpus_dir, dict_path, model_path, output_dir
     ]
-
-
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-
+    result = subprocess.run(mfa_cmd, capture_output=True, text=True)
     print("STDOUT:", result.stdout)
     print("STDERR:", result.stderr)
     if result.returncode != 0:
         raise RuntimeError(f"MFA failed with exit code {result.returncode}")
+
 
 def convert_to_wav(file_storage, output_path):
     """Convert uploaded FileStorage audio into MFA-friendly wav."""
@@ -209,3 +202,4 @@ def convert_to_wav(file_storage, output_path):
 #     filepath = os.path.join("uploads", filename)
 #     audio_file.save(filepath)
 #     return jsonify({"user_audio_path": filepath})
+
