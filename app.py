@@ -85,19 +85,32 @@ def make_lab(word, save_path):
 
 
 def run_mfa(corpus_dir, dict_path, model_path, output_dir):
+    MFA_BIN = os.path.expanduser("~/miniconda/envs/mfa/bin/mfa")
+
     mfa_cmd = [
-        "mfa", "align", corpus_dir, dict_path, model_path, output_dir
+        MFA_BIN,
+        "align",
+        corpus_dir,
+        dict_path,
+        model_path,
+        output_dir
     ]
-    result = subprocess.run(mfa_cmd, capture_output=True, text=True)
-    print("STDOUT:", result.stdout)
-    print("STDERR:", result.stderr)
-    if result.returncode != 0:
-        raise RuntimeError(f"MFA failed with exit code {result.returncode}")
+
+    try:
+        result = subprocess.run(
+            mfa_cmd,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return f"MFA failed with error:\n{e.stderr}"
+
 
 
 def convert_to_wav(file_storage, output_path):
     """Convert uploaded FileStorage audio into MFA-friendly wav."""
-    # file_storage is the request.files["audio"] object
 
     command = [
         "ffmpeg",
@@ -202,4 +215,5 @@ def convert_to_wav(file_storage, output_path):
 #     filepath = os.path.join("uploads", filename)
 #     audio_file.save(filepath)
 #     return jsonify({"user_audio_path": filepath})
+
 
