@@ -1,0 +1,4 @@
+flask
+gunicorn
+gtts
+montreal-forced-aligner==2.2.17
