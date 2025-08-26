@@ -13,7 +13,8 @@ services:
 
       conda install -y -c conda-forge montreal-forced-aligner ffmpeg cmake make pkg-config sentencepiece
 
-      pip install flask gunicorn gtts
+      pip install flask gunicorn gtts pandas
 
     startCommand: |
       source $HOME/miniconda/bin/activate mfa && gunicorn app:app
+
