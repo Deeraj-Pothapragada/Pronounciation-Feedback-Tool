@@ -21,6 +21,10 @@ def index():
 
 vocab_df = pd.read_csv("genki1vocab.csv")
 
+@app.route("/debug_tmp")
+def debug_tmp():
+    files = os.listdir("/tmp")
+    return {"tmp_files": files}
 
 @app.route("/random_word")
 def random_word():
@@ -213,6 +217,7 @@ def convert_to_wav(file_storage, output_path):
 #     filepath = os.path.join("uploads", filename)
 #     audio_file.save(filepath)
 #     return jsonify({"user_audio_path": filepath})
+
 
 
 
