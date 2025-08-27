@@ -1,20 +1,10 @@
 services:
   - type: web
     name: mfa-app
-    env: python
+    env: docker
     plan: free
-    buildCommand: |
-      curl -sLo miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-      bash miniconda.sh -b -p $HOME/miniconda
-      export PATH="$HOME/miniconda/bin:$PATH"
+    dockerfilePath: ./Dockerfile
 
-      conda create -y -n mfa python=3.9
-      conda run -n mfa conda install -y -c conda-forge montreal-forced-aligner ffmpeg cmake make pkg-config sentencepiece
-
-      conda run -n mfa pip install -r requirements.txt
-
-    startCommand: |
-      conda run -n mfa gunicorn app:app
 
 
 
