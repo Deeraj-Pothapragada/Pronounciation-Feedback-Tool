@@ -23,15 +23,12 @@ vocab_df = pd.read_csv("genki1vocab.csv")
 
 @app.route("/debug_tmp")
 def debug_tmp():
-    files = os.listdir("/tmp")
+    files = os.listdir("/tmp/uploads")
     return {"tmp_files": files}
 
 @app.route("/random_word")
 def random_word():
-    # Pick a random row
     row = vocab_df.sample(1).iloc[0]
-
-    # Use hiragana if kanji is blank
     display_word = row["kanji"] if pd.notna(row["kanji"]) and row["kanji"].strip() != "" else row["hiragana"]
 
     return jsonify({
@@ -151,5 +148,6 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
