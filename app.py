@@ -68,9 +68,17 @@ def align():
     run_mfa(session_path, LEXICON, MFA_MODEL, session_path)
 
     random_score = random.randint(1, 100)
-    feedback = f"Your pronunciation score is {random_score}/100 for {target_word}"
+    feedback = f"Your pronunciation score is {random_score}/100 for {target_word}. Session ID: {session_id}"
 
     shutil.rmtree(session_path, ignore_errors=True)
+
+@app.route("/download/<session_id>/<filename>")
+def download_file(session_id, filename):
+    file_path = os.path.join(UPLOAD_FOLDER, session_id, filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    return "File not found", 404
+
 
 
     return jsonify({
@@ -87,8 +95,6 @@ def make_lab(word, save_path):
     with open(save_path, "w", encoding="utf-8") as f:
         f.write(word + "\n")
 
-
-import subprocess
 
 def run_mfa(corpus_dir, dict_path, model_path, output_dir):
     mfa_cmd = [
@@ -116,15 +122,14 @@ def convert_to_wav(file_storage, output_path):
 
     command = [
         "ffmpeg",
-        "-y",              # overwrite
-        "-i", "pipe:0",    # read input from stdin
-        "-ac", "1",        # mono
-        "-ar", "16000",    # 16kHz
-        "-sample_fmt", "s16",  # 16-bit PCM
+        "-y",              
+        "-i", "pipe:0",    
+        "-ac", "1",        
+        "-ar", "16000",    
+        "-sample_fmt", "s16",  
         output_path
     ]
 
-    # run ffmpeg with stdin as the upload file stream
     process = subprocess.Popen(
         command,
         stdin=subprocess.PIPE,
@@ -132,7 +137,6 @@ def convert_to_wav(file_storage, output_path):
         stderr=subprocess.PIPE
     )
 
-    # write upload directly into ffmpeg
     out, err = process.communicate(file_storage.read())
 
     if process.returncode != 0:
@@ -147,77 +151,4 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-    # data = request.json
-    # user_audio = data["user_audio_path"]
-    # word = data["word"]
-    # reference_audio = f"reference/{word}.wav"
-
-    # # Prepare MFA input folder
-    # input_dir = "mfa_input"
-    # os.makedirs(input_dir, exist_ok=True)
-
-    # # MFA expects .lab file with transcription
-    # lab_path = os.path.join(input_dir, f"{word}.lab")
-    # with open(lab_path, "w", encoding="utf-8") as f:
-    #     f.write(word)
-
-    # # Copy audio into input dir
-    # import shutil
-    # shutil.copy(user_audio, os.path.join(input_dir, f"{word}.wav"))
-
-    # output_dir = "mfa_output"
-    # os.makedirs(output_dir, exist_ok=True)
-
-    # # Run MFA alignment
-    # subprocess.run([
-    #     "mfa", "align",
-    #     input_dir,
-    #     LEXICON,
-    #     MFA_MODEL,
-    #     output_dir
-    # ], check=True)
-
-    # textgrid_path = os.path.join(output_dir, f"{word}.TextGrid")
-    # return jsonify({"textgrid_path": textgrid_path})
-
-
-# @app.route("/generate_reference", methods=["POST"])
-# def generate_reference():
-#     data = request.json
-#     word = data["word"]
-#     output_path = f"reference/{word}.wav"
-
-#     # synthesis_input = texttospeech.SynthesisInput(text=word)
-#     # voice = texttospeech.VoiceSelectionParams(
-#     #     language_code="te-IN",
-#     #     ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
-#     # )
-#     # audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.LINEAR16)
-
-#     # response = tts_client.synthesize_speech(
-#     #     input=synthesis_input,
-#     #     voice=voice,
-#     #     audio_config=audio_config
-#     # )
-
-#     # with open(output_path, "wb") as out:
-#     #     out.write(response.audio_content)
-
-#     text_to_wav(word, output_path)
-
-#     return jsonify({"reference_path": output_path})
-
-# @app.route("/upload_user_audio", methods=["POST"])
-# def upload_user_audio():
-#     audio_file = request.files["audio"]
-#     filename = audio_file.filename
-#     filepath = os.path.join("uploads", filename)
-#     audio_file.save(filepath)
-#     return jsonify({"user_audio_path": filepath})
-
-
-
 
