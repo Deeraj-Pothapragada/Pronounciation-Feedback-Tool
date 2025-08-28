@@ -72,6 +72,12 @@ def align():
 
     shutil.rmtree(session_path, ignore_errors=True)
 
+
+    return jsonify({
+        "status": "ok",
+        "feedback": feedback
+    })
+
 @app.route("/download/<session_id>/<filename>")
 def download_file(session_id, filename):
     file_path = os.path.join(UPLOAD_FOLDER, session_id, filename)
@@ -79,12 +85,6 @@ def download_file(session_id, filename):
         return send_file(file_path, as_attachment=True)
     return "File not found", 404
 
-
-
-    return jsonify({
-        "status": "ok",
-        "feedback": feedback
-    })
 
 def text_to_wav(text, output_file):
     tts = gTTS(text, lang="ja")
@@ -151,4 +151,5 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
