@@ -30,7 +30,7 @@
         let currentWord = null;  // stores the word currently shown
 
         async function loadWord() {
-        const res = await fetch("/random_word");
+        const res = await fetch("http://pronounciation-feedback-tool.onrender.com/random_word");
         const data = await res.json();
         currentWord = data;
 
@@ -80,7 +80,7 @@
 
 
         try {
-            const response = await fetch("/align", {
+            const response = await fetch("http://pronounciation-feedback-tool.onrender.com/align", {
             method: "POST",
             body: formData
             });
@@ -97,3 +97,4 @@
     </script>
 </body>
 </html>
+
