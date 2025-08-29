@@ -6,6 +6,8 @@ import shutil
 import subprocess
 import random
 import pandas as pd
+import parselmouth 
+from praatio import tgio
 app = Flask(__name__)
 
 
@@ -21,10 +23,10 @@ def index():
 
 vocab_df = pd.read_csv("genki1vocab.csv")
 
-@app.route("/debug_tmp")
-def debug_tmp():
-    files = os.listdir("/tmp/uploads")
-    return {"tmp_files": files}
+# @app.route("/debug_tmp")
+# def debug_tmp():
+#     files = os.listdir("/tmp/uploads")
+#     return {"tmp_files": files}
 
 @app.route("/random_word")
 def random_word():
@@ -64,8 +66,16 @@ def align():
 
     run_mfa(session_path, LEXICON, MFA_MODEL, session_path)
 
+    user_textgrid = os.path.join(session_path, "user.TextGrid") 
+    ref_textgrid = os.path.join(session_path, "ref.TextGrid")
+    user_info = get_info(user_wav, user_textgrid)
+    ref_info = get_info(ref_wav, ref_textgrid)
+
+
+    diff_summary = compare_infos(user_info, ref_info)
+
     random_score = random.randint(1, 100)
-    feedback = f"Your pronunciation score is {random_score}/100 for {target_word}. Session ID: {session_id}"
+    feedback = f"Differences: {diff_summary}. Session ID: {session_id}"
 
     shutil.rmtree(session_path, ignore_errors=True)
 
@@ -75,12 +85,46 @@ def align():
         "feedback": feedback
     })
 
-@app.route("/download/<session_id>/<filename>")
-def download_file(session_id, filename):
-    file_path = os.path.join(UPLOAD_FOLDER, session_id, filename)
-    if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True)
-    return "File not found", 404
+def get_info(audio_path, textgrid_path, tier_name="phones"):
+    snd = parselmouth.Sound(audio_path)
+
+    def get_phoneme_segments(tg_path, tier_name):
+        tg = tgio.openTextgrid(tg_path, includeEmptyIntervals=True)
+        entries = tg.tierDict[tier_name].entryList
+        return [(start, end, label) for start, end, label in entries if label.strip()]
+
+    def get_formants(start, end):
+        segment = snd.extract_part(from_time=start, to_time=end, preserve_times=True)
+        formant = segment.to_formant_burg()
+        times = segment.xs()
+        if not times:
+            return (None, None)
+        f1 = [formant.get_value_at_time(1, t) for t in times]
+        f2 = [formant.get_value_at_time(2, t) for t in times]
+        f1 = [x for x in f1 if x]
+        f2 = [x for x in f2 if x]
+        if not f1 or not f2:
+            return (None, None)
+        return (sum(f1)/len(f1), sum(f2)/len(f2))
+
+    segments = get_phoneme_segments(textgrid_path, tier_name)
+    return [(label, end - start, get_formants(start, end)) for start, end, label in segments]
+
+def compare_infos(user_info, ref_info):
+    comparisons = []
+    for (u_label, u_dur, (u_f1, u_f2)), (r_label, r_dur, (r_f1, r_f2)) in zip(user_info, ref_info):
+        if u_label == r_label and u_f1 and r_f1:
+            diff_f1 = abs(u_f1 - r_f1)
+            diff_f2 = abs(u_f2 - r_f2)
+            comparisons.append(f"{u_label}: ΔF1={diff_f1:.1f}, ΔF2={diff_f2:.1f}")
+    return "; ".join(comparisons)
+
+# @app.route("/download/<session_id>/<filename>")
+# def download_file(session_id, filename):
+#     file_path = os.path.join(UPLOAD_FOLDER, session_id, filename)
+#     if os.path.exists(file_path):
+#         return send_file(file_path, as_attachment=True)
+#     return "File not found", 404
 
 
 def text_to_wav(text, output_file):
@@ -148,6 +192,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
