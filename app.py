@@ -160,30 +160,25 @@ def run_mfa(corpus_dir, dict_path, model_path, output_dir):
 
 
 def convert_to_wav(file_storage, output_path):
+    temp_input = output_path + ".tmp"
+    file_storage.save(temp_input)
 
     command = [
         "ffmpeg",
-        "-y",              
-        "-i", "pipe:0",    
-        "-ac", "1",        
-        "-ar", "16000",    
-        "-sample_fmt", "s16",  
+        "-y",
+        "-i", temp_input,
+        "-ac", "1",
+        "-ar", "16000",
+        "-sample_fmt", "s16",
         output_path
     ]
 
-    process = subprocess.Popen(
-        command,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-
-    out, err = process.communicate(file_storage.read())
-
+    process = subprocess.run(command, capture_output=True, text=True)
     if process.returncode != 0:
-        print("FFmpeg error:", err.decode())
+        print("FFmpeg error:", process.stderr)
         raise RuntimeError("Audio conversion failed")
 
+    os.remove(temp_input)  
     return output_path
 
 
@@ -192,6 +187,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
