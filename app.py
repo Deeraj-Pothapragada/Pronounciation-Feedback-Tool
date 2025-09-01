@@ -23,9 +23,9 @@ def index():
 
 vocab_df = pd.read_csv("genki1vocab.csv")
 
-@app.route("/debug_tmp")
-def debug_tmp():
-    files = os.listdir("/tmp/uploads")
+@app.route("/debug_tmp/<session_id>")
+def debug_tmp(session_id):
+    files = os.listdir(f"/tmp/uploads/{session_id}")
     return {"tmp_files": files}
 
 @app.route("/random_word")
@@ -187,6 +187,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
