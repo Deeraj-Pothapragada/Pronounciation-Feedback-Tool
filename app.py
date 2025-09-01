@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 import os
+import sys
 from gtts import gTTS
 import uuid
 import shutil
@@ -146,16 +147,25 @@ def run_mfa(corpus_dir, dict_path, model_path, output_dir):
         output_dir
     ]
 
-    try:
-        result = subprocess.run(
-            mfa_cmd,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        return result.stdout 
-    except subprocess.CalledProcessError as e:
-        return f"MFA alignment failed:\n{e.stderr}"
+    # try:
+    #     result = subprocess.run(
+    #         mfa_cmd,
+    #         capture_output=True,
+    #         text=True,
+    #         check=True
+    #     )
+    #     return result.stdout 
+    # except subprocess.CalledProcessError as e:
+    #     return f"MFA alignment failed:\n{e.stderr}"
+    process = subprocess.Popen(
+    mfa_cmd,
+    stdout=sys.stdout,
+    stderr=sys.stderr
+    )
+    process.wait()
+
+    if process.returncode != 0:
+        raise RuntimeError(f"MFA failed with return code {process.returncode}")
 
 
 
@@ -187,6 +197,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
