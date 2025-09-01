@@ -14,7 +14,7 @@ RUN conda install -y -n mfa -c conda-forge \
     sentencepiece \
     libsndfile
 RUN conda run -n mfa pip install \
-    "numpy=1.23" "scipy=1.10" "numba=0.56" "librosa=0.10"\
+    "numpy==1.23" "scipy==1.10" "numba==0.56" "librosa==0.10"\
     flask gunicorn gtts pandas \
     praatio praat-parselmouth
 
@@ -23,6 +23,7 @@ EXPOSE 10000
 ENV PATH /opt/conda/envs/mfa/bin:$PATH
 
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+
 
 
 
