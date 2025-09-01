@@ -23,10 +23,10 @@ def index():
 
 vocab_df = pd.read_csv("genki1vocab.csv")
 
-# @app.route("/debug_tmp")
-# def debug_tmp():
-#     files = os.listdir("/tmp/uploads")
-#     return {"tmp_files": files}
+@app.route("/debug_tmp")
+def debug_tmp():
+    files = os.listdir("/tmp/uploads")
+    return {"tmp_files": files}
 
 @app.route("/random_word")
 def random_word():
@@ -119,12 +119,12 @@ def compare_infos(user_info, ref_info):
             comparisons.append(f"{u_label}: ΔF1={diff_f1:.1f}, ΔF2={diff_f2:.1f}")
     return "; ".join(comparisons)
 
-# @app.route("/download/<session_id>/<filename>")
-# def download_file(session_id, filename):
-#     file_path = os.path.join(UPLOAD_FOLDER, session_id, filename)
-#     if os.path.exists(file_path):
-#         return send_file(file_path, as_attachment=True)
-#     return "File not found", 404
+@app.route("/download/<session_id>/<filename>")
+def download_file(session_id, filename):
+    file_path = os.path.join(UPLOAD_FOLDER, session_id, filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    return "File not found", 404
 
 
 def text_to_wav(text, output_file):
@@ -187,6 +187,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
