@@ -7,7 +7,7 @@ import subprocess
 import random
 import pandas as pd
 import parselmouth 
-from praatio import tgio
+from praatio import textgrid
 app = Flask(__name__)
 
 
@@ -89,8 +89,8 @@ def get_info(audio_path, textgrid_path, tier_name="phones"):
     snd = parselmouth.Sound(audio_path)
 
     def get_phoneme_segments(tg_path, tier_name):
-        tg = tgio.openTextgrid(tg_path, includeEmptyIntervals=True)
-        entries = tg.tierDict[tier_name].entryList
+        tg = textgrid.openTextgrid(tg_path, True)
+        entries = tg._tierDict[tier_name].entries
         return [(start, end, label) for start, end, label in entries if label.strip()]
 
     def get_formants(start, end):
@@ -101,8 +101,8 @@ def get_info(audio_path, textgrid_path, tier_name="phones"):
             return (None, None)
         f1 = [formant.get_value_at_time(1, t) for t in times]
         f2 = [formant.get_value_at_time(2, t) for t in times]
-        f1 = [x for x in f1 if x]
-        f2 = [x for x in f2 if x]
+        f1 = [x for x in f1 if x > 0]
+        f2 = [x for x in f2 if x > 0]
         if not f1 or not f2:
             return (None, None)
         return (sum(f1)/len(f1), sum(f2)/len(f2))
@@ -192,6 +192,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
