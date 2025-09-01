@@ -5,14 +5,25 @@ WORKDIR /app
 COPY . /app
 
 RUN conda create -y -n mfa python=3.9 \
-    && conda install -y -n mfa -c conda-forge montreal-forced-aligner ffmpeg cmake make pkg-config sentencepiece libsndfile \
-    && conda run -n mfa pip install numpy<1.25 scipy<1.11 flask gunicorn gtts pandas praatio praat-parselmouth
+RUN conda install -y -n mfa -c conda-forge \
+    montreal-forced-aligner \
+    ffmpeg \
+    cmake \
+    make \
+    pkg-config \
+    sentencepiece \
+    libsndfile
+RUN conda run -n mfa pip install \
+    "numpy<1.25" "scipy<1.11" \
+    flask gunicorn gtts pandas \
+    praatio praat-parselmouth
 
 EXPOSE 10000
 
 ENV PATH /opt/conda/envs/mfa/bin:$PATH
 
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+
 
 
 
