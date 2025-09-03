@@ -141,8 +141,7 @@ def make_lab(word, save_path):
 def run_mfa(corpus_dir, dict_path, model_path, output_dir):
 
     mfa_cmd = [
-        "conda", "run", "-n", "mfa",
-        "mfa", "align",
+        "conda", "run", "-n", "mfa", "mfa", "align",
         corpus_dir,
         dict_path,
         model_path,
@@ -196,6 +195,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
