@@ -111,6 +111,7 @@ def get_info(audio_path, textgrid_path, tier_name="phones"):
     segments = get_phoneme_segments(textgrid_path, tier_name)
     return [(label, end - start, get_formants(start, end)) for start, end, label in segments]
 
+# first step of full pronounciation breakdown
 def compare_infos(user_info, ref_info):
     comparisons = []
     for (u_label, u_dur, (u_f1, u_f2)), (r_label, r_dur, (r_f1, r_f2)) in zip(user_info, ref_info):
@@ -195,6 +196,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
