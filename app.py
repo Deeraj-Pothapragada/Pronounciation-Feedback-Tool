@@ -9,6 +9,7 @@ import random
 import pandas as pd
 import parselmouth 
 from praatio import textgrid
+from comparison import compare_infos
 app = Flask(__name__)
 
 
@@ -161,6 +162,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
