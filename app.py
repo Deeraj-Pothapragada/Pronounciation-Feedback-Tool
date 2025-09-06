@@ -59,6 +59,9 @@ def align():
     user_lab = os.path.join(session_path, "user.lab")
     make_lab(target_word, user_lab)
 
+    user_textgrid = os.path.join(session_path, "user.TextGrid") 
+
+
     ref_wav = os.path.join(session_path, "ref.wav")
     text_to_wav(target_word, ref_wav)
 
@@ -66,15 +69,11 @@ def align():
     ref_lab = os.path.join(session_path, "ref.lab")
     make_lab(target_word, ref_lab)
 
+    ref_textgrid = os.path.join(session_path, "ref.TextGrid")
+
     run_mfa(session_path, LEXICON, MFA_MODEL, session_path)
 
-    user_textgrid = os.path.join(session_path, "user.TextGrid") 
-    ref_textgrid = os.path.join(session_path, "ref.TextGrid")
-    user_info = get_info(user_wav, user_textgrid)
-    ref_info = get_info(ref_wav, ref_textgrid)
-
-
-    diff_summary = compare_infos(user_info, ref_info)
+    diff_summary = compare_infos(user_wav, user_textgrid, ref_wav, ref_textgrid)
 
     random_score = random.randint(1, 100)
     feedback = f"Differences: {diff_summary}. Session ID: {session_id}"
@@ -162,6 +161,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
