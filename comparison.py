@@ -23,7 +23,10 @@ def get_info(audio_path, textgrid_path, tier_name="phones"):
     segments = get_phoneme_segments(textgrid_path, tier_name)
     return [(label, end - start, get_formants(start, end)) for start, end, label in segments]
 
-def compare_infos(user_info, ref_info):
+
+def compare_infos(user_wav, user_textgrid, ref_wav, ref_textgrid):
+    user_info = get_info(user_wav, user_textgrid)
+    ref_info = get_info(ref_wav, ref_textgrid)
     comparisons = []
     for (u_label, u_dur, (u_f1, u_f2)), (r_label, r_dur, (r_f1, r_f2)) in zip(user_info, ref_info):
         if u_label == r_label and u_f1 and r_f1:
