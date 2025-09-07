@@ -1,3 +1,6 @@
+import parselmouth 
+from praatio import textgrid
+
 def get_info(audio_path, textgrid_path, tier_name="phones"):
     snd = parselmouth.Sound(audio_path)
 
