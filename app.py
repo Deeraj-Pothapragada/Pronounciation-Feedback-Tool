@@ -22,6 +22,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def index():
     return send_from_directory(".", "index.html")
 
+@app.route("/health")
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 vocab_df = pd.read_csv("genki1vocab.csv")
 
@@ -161,6 +164,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
