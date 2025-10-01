@@ -33,8 +33,9 @@ def compare_infos(user_wav, user_textgrid, ref_wav, ref_textgrid):
     comparisons = []
     for (u_label, u_dur, (u_f1, u_f2)), (r_label, r_dur, (r_f1, r_f2)) in zip(user_info, ref_info):
         if u_label == r_label and u_f1 and r_f1:
-            diff_f1 = abs(u_f1 - r_f1)
-            diff_f2 = abs(u_f2 - r_f2)
-            comparisons.append(f"{u_label}: ΔF1={diff_f1:.1f}, ΔF2={diff_f2:.1f}")
-    return "; ".join(comparisons)
+            diff_length = u_dur - r_dur
+            diff_f1 = u_f1 - r_f1
+            diff_f2 = u_f2 - r_f2
+            comparisons.append(f"{u_label}: ΔLength = {diff_length:.2f}, ΔF1={diff_f1:.1f}, ΔF2={diff_f2:.1f}")
+    return "\n ".join(comparisons)
 
