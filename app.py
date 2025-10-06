@@ -79,7 +79,7 @@ def align():
     diff_summary = compare_infos(user_wav, user_textgrid, ref_wav, ref_textgrid)
 
     random_score = random.randint(1, 100)
-    feedback = f"Differences: {diff_summary}. Session ID: {session_id}"
+    feedback = diff_summary
 
     shutil.rmtree(session_path, ignore_errors=True)
 
@@ -164,6 +164,7 @@ def convert_to_wav(file_storage, output_path):
 # if __name__ == "__main__":
 #     print("Starting Flask test server...")
 #     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
